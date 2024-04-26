@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-3 text-center">
+  <div class="row">
+    {% for fabric in fabrics %}
+    <!-- First column -->
+    <div class="col-md">
+
+      <!-- Card -->
+     <div class="card {% if fabric.passed %}passed{% endif %}">
+        <div class="bg-image hover-overlay" data-mdb-ripple-init data-mdb-ripple-color="light">
+          <img src="{{ url_for('static', filename='img/' + fabric.image) }}" class="img-fluid" />
+          <a href="#!">
+            <div class="mask" style="background-color: rgba(251, 251, 251, 0.15);"></div>
+          </a>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">{{ fabric.title }}</h5>
+          <p class="card-text"></p>
+          <a href="{{ url_for('play', fabric_id=fabric.id) }}" class="btn btn-primary">Игра</a>
+          <a href="#!" class="btn btn-primary">Фотоальбом</a>
+          <a href="#!" class="btn btn-primary">Видео</a>
+        </div>
+      </div>
+      <!-- Card -->
+
+    </div>
+    <!-- First column -->
+
+    {%endfor%}
+
+  </div>
+</div>
+{% endblock %}

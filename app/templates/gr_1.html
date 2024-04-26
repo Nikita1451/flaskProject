@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+ <form action="/diploms" method="post">
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 mx-auto"> <!-- Используем класс mx-auto для центрирования содержимого -->
+      <div class="block-content text-center"> <!-- Добавляем классы для блока контента и центрирования текста -->
+        <h1>Отлично! Вы набрали достаточно очков чтобы получить грамоту!</h1>
+        <p>Грамоту вы можете получить двумя способами!</p>
+        <p>Первый - Распечатать в музее.</p>
+        <p>Второй - Отправить на e-mail.</p>
+        <div class="mt-3"> <!-- Добавляем отступ для размещения кнопок -->
+          <button class="btn btn-primary mr-2" type="submit" name="email_button">Email</button> <!-- Добавляем первую кнопку -->
+          <button class="btn btn-secondary" type="submit" id="print_button">Распечатать</button> <!-- Добавляем вторую кнопку -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+ </form>
+{% endblock %}
