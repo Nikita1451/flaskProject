@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, render_template, redirect, url_for, request
 from flask_login import (
     LoginManager,
@@ -6,7 +8,7 @@ from flask_login import (
     logout_user,
     current_user,
 )
-from forms.user_fabric import UserFabricForm
+from PIL import Image, ImageDraw, ImageFont
 from data.user_fabric import UserFabric
 from app.sender import send_email
 from dotenv import load_dotenv
@@ -42,7 +44,7 @@ def diplom_sett():
             )
         if "push_email" in request.form:
             return redirect(
-                f"/email/{(request.form['firstName'], request.form['lastName'])}"
+                f"/email/{request.form['firstName']} {request.form['lastName']}"
             )
 
 
@@ -150,11 +152,11 @@ def add_score(id):
     # здесь нужно отправить запрос к БД, в котором для фабрики, которую прошел пользователь, будет проставлено passed
     db_sess = db_session.create_session()
     if (
-        db_sess.query(UserFabric)
-        .filter(
-            UserFabric.user_id == current_user.id,
-            UserFabric.fabric_id == id)
-        .first()
+            db_sess.query(UserFabric)
+                    .filter(
+                UserFabric.user_id == current_user.id,
+                UserFabric.fabric_id == id)
+                    .first()
     ):
         return redirect(f"/diploms/{id}")
     user_fabric = UserFabric(
@@ -169,11 +171,34 @@ def add_score(id):
 @app.route("/email/<name_surname>", methods=["GET", "POST"])
 def post_form(name_surname):
     email = current_user.email
+    print(name_surname)
+    add_text_to_image(name_surname)
     if send_email(
-        email, "Test letter", "test text", ["1.png", "pdfdoc.pdf", "text.txt"]
+            email,  "", "Спасибо за участие", ["gr1.png"]
     ):
-        return f"Letter send successfully from to the address {email}"
-    return f"An error occurred while sending an email to {email}"
+        os.remove("gr1.png")
+        return redirect("/")
+    os.remove("gr1.png")
+    return redirect("/")
+
+
+def add_text_to_image(text, image_path="static/gramot.png", output_path="gr1.png", font_size=30,
+                      text_color=(0, 0, 0), font_path=None):
+    # Открываем изображение
+    print(text)
+    text = text.replace(' ', '\n')
+    text = f"Спасибо за участие \n в развивающемся проекте Flask \n с кодовым названием БТПМ \n Данной грамотой награждается: \n {text}"
+    image = Image.open(image_path)
+    draw = ImageDraw.Draw(image)
+    font = ImageFont.truetype("arial.ttf", size=font_size, encoding='UTF-8')
+    # Определяем координаты для выравнивания по центру
+    x = 100
+    y = 400
+    print(x, y)
+    # Добавляем текст на изображение
+    draw.text((x, y), text, fill=text_color, font=font)
+    # Сохраняем измененное изображение
+    image.save(output_path)
 
 
 def main():
