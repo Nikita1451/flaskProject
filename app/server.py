@@ -1,6 +1,6 @@
 import os
-
-from flask import Flask, render_template, redirect, url_for, request
+import requests
+from flask import Flask, render_template, redirect, url_for, request, send_file
 from flask_login import (
     LoginManager,
     login_user,
@@ -192,13 +192,23 @@ def add_text_to_image(text, image_path="static/gramot.png", output_path="gr1.png
     draw = ImageDraw.Draw(image)
     font = ImageFont.truetype("arial.ttf", size=font_size, encoding='UTF-8')
     # Определяем координаты для выравнивания по центру
-    x = 100
+    x = 400
     y = 400
     print(x, y)
     # Добавляем текст на изображение
-    draw.text((x, y), text, fill=text_color, font=font)
+    draw.text((x, y), text, fill=text_color, font=font, align="center")
     # Сохраняем измененное изображение
     image.save(output_path)
+@app.route("/secret")
+def secret():
+    response = requests.get("https://api.thecatapi.com/v1/images/search")
+    image_url = response.json()[0]['url']
+    # Загрузить изображение по URL-адресу
+    image_path = 'image.jpg'
+    with open(image_path, 'wb') as f:
+        f.write(requests.get(image_url).content)
+    # Отправить изображение клиенту
+    return send_file('image.jpg', mimetype='image/jpg')
 
 
 def main():
