@@ -191,7 +191,7 @@ def add_text_to_image(text, image_path="static/gramot.png", output_path="gr1.png
     image = Image.open(image_path)
     draw = ImageDraw.Draw(image)
     font = ImageFont.truetype("arial.ttf", size=font_size, encoding='UTF-8')
-    # Определяем координаты для выравнивания по центру
+    # Определяем координаты для  выравнивания по центру
     x = 400
     y = 400
     print(x, y)
