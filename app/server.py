@@ -149,7 +149,7 @@ def login():
 
 @app.route("/add_score/<int:id>", methods=["GET", "POST"])
 def add_score(id):
-    # здесь нужно отправить запрос к БД, в котором для фабрики, которую прошел пользователь, будет проставлено passed
+    # здесь нужно отправить запрос к БД, в котором для фабрики,  которую прошел пользователь, будет проставлено passed
     db_sess = db_session.create_session()
     if (
             db_sess.query(UserFabric)
