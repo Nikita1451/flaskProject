@@ -9,6 +9,7 @@ from flask_login import (
     current_user,
 )
 from PIL import Image, ImageDraw, ImageFont
+
 from data.user_fabric import UserFabric
 from app.sender import send_email
 from dotenv import load_dotenv
@@ -18,6 +19,7 @@ from data.users import User
 from data import db_session
 
 app = Flask(__name__, static_url_path="/static")
+
 load_dotenv()
 login_manager = LoginManager()
 login_manager.init_app(app)
