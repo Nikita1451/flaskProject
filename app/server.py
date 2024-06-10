@@ -53,12 +53,13 @@ def diplom_sett():
 @login_manager.user_loader
 def load_user(user_id):
     db_sess = db_session.create_session()
-    return db_sess.query(User).get(user_id)
+    return db_sess.query(User).filter(User.id == user_id).first()
 
 
 @app.route("/play/<int:fabric_id>")
 @login_required
 def play(fabric_id):
+
     return render_template(
         f"game_{fabric_id}.html"
     )
