@@ -1,3 +1,4 @@
+import inspect
 import os
 import requests
 from flask import Flask, render_template, redirect, url_for, request, send_file
@@ -8,8 +9,8 @@ from flask_login import (
     logout_user,
     current_user,
 )
+from flask_cors import  CORS
 from PIL import Image, ImageDraw, ImageFont
-
 from data.user_fabric import UserFabric
 from app.sender import send_email
 from dotenv import load_dotenv
@@ -24,11 +25,13 @@ load_dotenv()
 login_manager = LoginManager()
 login_manager.init_app(app)
 app.config["SECRET_KEY"] = "yandexlyceum_secret _key"
+CORS(app)
 
 
 @app.route("/diploms/<play_id>", methods=["GET", "POST"])
 def diplom(play_id):
-    if request.method == "POST":
+    print(play_id)
+    if request.method == "POST" and play_id != 3:
         return render_template(
             f"base.html"
         )
@@ -36,7 +39,11 @@ def diplom(play_id):
         f"gr_{play_id}.html"
     )
 
-
+@app.route('/game_over', methods=['POST'])
+def game_over():
+    data = request.get_json()
+    print("Game over received with data:", data)
+    return "Game Over", 200
 @app.route("/diploms", methods=["GET", "POST"])
 def diplom_sett():
     if request.method == "POST":
@@ -59,7 +66,6 @@ def load_user(user_id):
 @app.route("/play/<int:fabric_id>")
 @login_required
 def play(fabric_id):
-
     return render_template(
         f"game_{fabric_id}.html"
     )
@@ -80,12 +86,12 @@ def index():
     # Достаем из БД, параметр passed из отдельной таблицы, соединяющей user and fabric
     fabrics = [
         {"id": 1, "title": "ЛТЗ", "image": "ltz.jpg", "passed": True},
-        {"id": 2, "title": "СЧЗ", "image": "schz.jpg", "passed": False},
+        {"id": 2, "title": "СЧЗ", "image": "schz.jpg", "passed": True},
         {
             "id": 3,
             "title": "Людиновокабель",
             "image": "ludinovo_cabel.jpg",
-            "passed": False,
+            "passed": True,
         },
     ]
     return render_template(
@@ -152,6 +158,11 @@ def login():
 
 @app.route("/add_score/<int:id>", methods=["GET", "POST"])
 def add_score(id):
+    print(id)
+    frame = inspect.currentframe()
+    call_stack = inspect.getouterframes(frame)
+    for frame_info in call_stack:
+        print(f'File: {frame_info.filename}, Line: {frame_info.lineno}, Function: {frame_info.function}')
     # здесь нужно отправить запрос к БД, в котором для фабрики,  которую прошел пользователь, будет проставлено passed
     db_sess = db_session.create_session()
     if (
@@ -177,12 +188,13 @@ def post_form(name_surname):
     print(name_surname)
     add_text_to_image(name_surname)
     if send_email(
-            email,  "", "Спасибо за участие", ["gr1.png"]
+            email, "", "Спасибо за участие", ["gr1.png"]
     ):
-        os.remove("gr1.png")
+        # os.remove("gr1.png")
         return redirect("/")
-    os.remove("gr1.png")
+    # os.remove("gr1.png")
     return redirect("/")
+
 
 
 def add_text_to_image(text, image_path="static/gramot.png", output_path="gr1.png", font_size=30,
@@ -202,6 +214,8 @@ def add_text_to_image(text, image_path="static/gramot.png", output_path="gr1.png
     draw.text((x, y), text, fill=text_color, font=font, align="center")
     # Сохраняем измененное изображение
     image.save(output_path)
+
+
 @app.route("/secret")
 def secret():
     response = requests.get("https://api.thecatapi.com/v1/images/search")

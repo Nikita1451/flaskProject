@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/game_schz.icon.png-f6f999f59fd7a3ff5d9e87322151f63e.stex"
+path="res://.import/game_schz.icon.png-7c90f88136db303a3b5694c99498f5f5.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://game/game_schz.icon.png"
-dest_files=[ "res://.import/game_schz.icon.png-f6f999f59fd7a3ff5d9e87322151f63e.stex" ]
+source_file="res://ПФЬУ/game_schz.icon.png"
+dest_files=[ "res://.import/game_schz.icon.png-7c90f88136db303a3b5694c99498f5f5.stex" ]
 
 [params]
 
