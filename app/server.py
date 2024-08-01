@@ -31,8 +31,7 @@ def diplom(play_id):
     if request.method == "POST":
         return render_template("base.html")
     return render_template(
-        f"gr_1.html"
-    )
+        f"gr_1.html")
 
 
 @app.route("/diploms", methods=["GET", "POST"])
