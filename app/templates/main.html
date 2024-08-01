@@ -6,7 +6,6 @@
     {% for fabric in fabrics %}
     <!-- First column -->
     <div class="col-md">
-
       <!-- Card -->
      <div class="card {% if fabric.passed %}passed{% endif %}">
         <div class="bg-image hover-overlay" data-mdb-ripple-init data-mdb-ripple-color="light">
@@ -18,18 +17,19 @@
         <div class="card-body">
           <h5 class="card-title">{{ fabric.title }}</h5>
           <p class="card-text"></p>
-          <a href="{{ url_for('play', fabric_id=fabric.id) }}" class="btn btn-primary">Игра</a>
-          <a href="#!" class="btn btn-primary">Фотоальбом</a>
+          {% if not fabric.passed %}
+            <a href="{{ url_for('play', fabric_id=fabric.id) }}" class="btn btn-primary">Игра</a>
+          {% else %}
+            <button class="btn btn-primary disabled">Игра</button>
+          {% endif %}
+          <a href="#!" class="btn btn-primary">{{fabric.id}}</a>
           <a href="#!" class="btn btn-primary">Видео</a>
         </div>
       </div>
       <!-- Card -->
-
     </div>
     <!-- First column -->
-
     {%endfor%}
-
   </div>
 </div>
 {% endblock %}

@@ -9,7 +9,6 @@ from flask_login import (
     logout_user,
     current_user,
 )
-from flask_cors import  CORS
 from PIL import Image, ImageDraw, ImageFont
 from data.user_fabric import UserFabric
 from app.sender import send_email
@@ -25,25 +24,17 @@ load_dotenv()
 login_manager = LoginManager()
 login_manager.init_app(app)
 app.config["SECRET_KEY"] = "yandexlyceum_secret _key"
-CORS(app)
 
 
 @app.route("/diploms/<play_id>", methods=["GET", "POST"])
 def diplom(play_id):
-    print(play_id)
-    if request.method == "POST" and play_id != 3:
-        return render_template(
-            f"base.html"
-        )
+    if request.method == "POST":
+        return render_template("base.html")
     return render_template(
-        f"gr_{play_id}.html"
+        f"gr_1.html"
     )
 
-@app.route('/game_over', methods=['POST'])
-def game_over():
-    data = request.get_json()
-    print("Game over received with data:", data)
-    return "Game Over", 200
+
 @app.route("/diploms", methods=["GET", "POST"])
 def diplom_sett():
     if request.method == "POST":
@@ -84,6 +75,9 @@ def index():
     if not current_user.is_authenticated:
         return redirect(url_for("login"))
     # Достаем из БД, параметр passed из отдельной таблицы, соединяющей user and fabric
+    db_ses = db_session.create_session()
+    fabrik_passed = [int(i.fabric_id) for i in db_ses.query(UserFabric).filter(UserFabric.user_id == current_user.id)]
+
     fabrics = [
         {"id": 1, "title": "ЛТЗ", "image": "ltz.jpg", "passed": True},
         {"id": 2, "title": "СЧЗ", "image": "schz.jpg", "passed": True},
@@ -94,6 +88,11 @@ def index():
             "passed": True,
         },
     ]
+    for i in fabrics:
+        if i["id"] in fabrik_passed:
+            i["passed"] = True
+        else:
+            i["passed"] = False
     return render_template(
         "main.html",
         title="Заводы Людиново",
@@ -158,25 +157,11 @@ def login():
 
 @app.route("/add_score/<int:id>", methods=["GET", "POST"])
 def add_score(id):
-    print(id)
-    frame = inspect.currentframe()
-    call_stack = inspect.getouterframes(frame)
-    for frame_info in call_stack:
-        print(f'File: {frame_info.filename}, Line: {frame_info.lineno}, Function: {frame_info.function}')
-    # здесь нужно отправить запрос к БД, в котором для фабрики,  которую прошел пользователь, будет проставлено passed
     db_sess = db_session.create_session()
-    if (
-            db_sess.query(UserFabric)
-                    .filter(
-                UserFabric.user_id == current_user.id,
-                UserFabric.fabric_id == id)
-                    .first()
-    ):
+    if db_sess.query(UserFabric).filter(
+            UserFabric.user_id == current_user.id, UserFabric.fabric_id == id).first():
         return redirect(f"/diploms/{id}")
-    user_fabric = UserFabric(
-        user_id=current_user.id,
-        fabric_id=id
-    )
+    user_fabric = UserFabric(user_id=current_user.id, fabric_id=id)
     db_sess.add(user_fabric)
     db_sess.commit()
     return redirect(f"/diploms/{id}")
@@ -190,11 +175,12 @@ def post_form(name_surname):
     if send_email(
             email, "", "Спасибо за участие", ["gr1.png"]
     ):
-        # os.remove("gr1.png")
-        return redirect("/")
-    # os.remove("gr1.png")
-    return redirect("/")
-
+        if os.path.exists("gr1.png"):
+            os.remove("gr1.png")
+        return redirect(url_for('index'))
+    if os.path.exists("gr1.png"):
+        os.remove("gr1.png")
+    return redirect(url_for('index'))
 
 
 def add_text_to_image(text, image_path="static/gramot.png", output_path="gr1.png", font_size=30,
