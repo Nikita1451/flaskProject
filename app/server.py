@@ -15,7 +15,7 @@ from app.sender import send_email
 from dotenv import load_dotenv
 from forms.user import RegisterForm, LoginForm
 from data.users import User
-
+import sqlite3
 from data import db_session
 
 app = Flask(__name__, static_url_path="/static")
@@ -122,6 +122,10 @@ def register():
         db_sess.add(user)
         db_sess.commit()
         f = True
+        db = sqlite3.connect("db/points.db")
+        cur = db.cursor()
+        print(str(form.email.data))
+        cur.execute(f"""INSERT INTO userpoint (email) VALUES ('{str(form.email.data)}');""")
         return redirect("/")
     return render_template(
         "register.html",
@@ -156,14 +160,19 @@ def login():
 
 @app.route("/add_score/<int:id>", methods=["GET", "POST"])
 def add_score(id):
-    db_sess = db_session.create_session()
-    if db_sess.query(UserFabric).filter(
-            UserFabric.user_id == current_user.id, UserFabric.fabric_id == id).first():
-        return redirect(f"/diploms/{id}")
-    user_fabric = UserFabric(user_id=current_user.id, fabric_id=id)
-    db_sess.add(user_fabric)
-    db_sess.commit()
-    return redirect(f"/diploms/{id}")
+    print(id)
+    db = sqlite3.connect("db/points.db")
+    cur = db.cursor()
+    cur.execute(f""" UPDATE userpoint
+        SET point = point + 1
+        WHERE email = '{current_user.email}'""")
+    db.commit()
+    cur = db.cursor()
+    nv = cur.execute(f"select point from userpoint where email = '{current_user.email}'").fetchone()
+    if int(nv[0]) >= 2:
+        return redirect(f"/diploms/1")
+    else:
+        return redirect(f"/")
 
 
 @app.route("/email/<name_surname>", methods=["GET", "POST"])
@@ -187,7 +196,7 @@ def add_text_to_image(text, image_path="static/gramot.png", output_path="gr1.png
     # Открываем изображение
     print(text)
     text = text.replace(' ', '\n')
-    text = f"Спасибо за участие \n в развивающемся проекте Flask \n с кодовым названием БТПМ \n Данной грамотой награждается: \n {text}"
+    text = f"Спасибо за участие \n в виртуальном туре \n 'Пром.зона города Людиново' \n Данной грамотой награждается: \n {text}"
     image = Image.open(image_path)
     draw = ImageDraw.Draw(image)
     font = ImageFont.truetype("arial.ttf", size=font_size, encoding='UTF-8')
