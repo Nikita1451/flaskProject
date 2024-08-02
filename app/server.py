@@ -226,7 +226,7 @@ def secret():
 
 def main():
     db_session.global_init("db/blogs.db")
-    app.run(debug=True)
+    app.run(host="0.0.0.0",debug=True)
 
 
 if __name__ == "__main__":
