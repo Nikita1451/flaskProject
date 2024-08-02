@@ -126,6 +126,7 @@ def register():
         cur = db.cursor()
         print(str(form.email.data))
         cur.execute(f"""INSERT INTO userpoint (email) VALUES ('{str(form.email.data)}');""")
+        db.commit()
         return redirect("/")
     return render_template(
         "register.html",
@@ -169,6 +170,7 @@ def add_score(id):
     db.commit()
     cur = db.cursor()
     nv = cur.execute(f"select point from userpoint where email = '{current_user.email}'").fetchone()
+    print(nv)
     if int(nv[0]) >= 2:
         return redirect(f"/diploms/1")
     else:
