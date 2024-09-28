@@ -99,7 +99,9 @@ def index():
         fabrics=fabrics
     )
 
-
+@app.route("/bonus")
+def bonus():
+    return render_template("index.html")
 @app.route("/register", methods=["GET", "POST"])
 def register():
     global f
