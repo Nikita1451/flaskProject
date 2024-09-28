@@ -87,6 +87,7 @@ def index():
             "passed": True,
         },
         {"id": 4, "title": "Агроинвест", "image": "ltz.jpg", "passed": True},
+        {"id": 5, "title": "Людиновский Хлебокомбинат", "image": "ltz.jpg", "passed": True},
     ]
     for i in fabrics:
         if i["id"] in fabrik_passed:
